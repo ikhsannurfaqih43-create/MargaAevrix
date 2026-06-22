@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MARGA AEVRIX</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins',sans-serif;
+-webkit-tap-highlight-color: transparent;
+}
+
+body{
+background:#050505;
+overflow-x:hidden;
+min-height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+padding:40px 20px;
+position: relative;
+}
+
+/* SCANLINE CRT EFFECT (Membuat layar terasa hidup) */
+body::before {
+content: " ";
+position: fixed;
+inset: 0;
+background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+background-size: 100% 4px;
+pointer-events: none;
+z-index: 999;
+opacity: 0.4;
+}
+
+/* LOADER */
+#loader{
+position:fixed;
+inset:0;
+background:#050505;
+display:flex;
+justify-content:center;
+align-items:center;
+z-index:99999;
+transition:1s;
+}
+
+.loader-content{
+position:relative;
+text-align:center;
+}
+
+.loader-logo{
+width:140px;
+height:140px;
+border-radius:50%;
+border:4px solid #FFD700;
+box-shadow:0 0 25px #FFD700;
+animation:floatLogo 3s infinite ease-in-out;
+}
+
+.loader-title{
+color:#FFD700;
+font-family: 'Orbitron', sans-serif;
+font-size:30px;
+font-weight:800;
+margin-top:25px;
+text-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+}
+
+.loader-progress{
+width:280px;
+height:10px;
+background:#222;
+border-radius:50px;
+overflow:hidden;
+margin:20px auto;
+border: 1px solid rgba(255, 215, 0, 0.2);
+}
+
+.loader-progress-fill{
+height:100%;
+width:0%;
+background:linear-gradient(90deg,#FFD700,#FFF3A0,#FFD700);
+animation:loading 4.5s forwards ease-in-out;
+}
+
+.loader-status{
+color:#FFD700;
+font-size:14px;
+font-style: italic;
+opacity: 0.8;
+}
+
+@keyframes loading{
+100%{width:100%}
+}
+
+@keyframes floatLogo{
+0%, 100%{ transform:translateY(0); }
+50%{ transform:translateY(-12px); }
+}
+
+/* BACKGROUND & CANVAS PARTICLES */
+.bg{
+position:fixed;
+inset:0;
+background:
+radial-gradient(circle at 50% 30%, rgba(255, 215, 0, 0.12), transparent 50%),
+radial-gradient(circle at 20% 80%, rgba(255, 215, 0, 0.08), transparent 40%),
+#050505;
+z-index:-2;
+}
+
+#particleCanvas {
+position: fixed;
+inset: 0;
+z-index: -1;
+pointer-events: none;
+}
+
+/* INSTANT RIPPLE EFFECT (DIOPTIMALKAN MENGIKUTI JARI) */
+.ripple {
+position: absolute;
+border: 2px solid rgba(255, 215, 0, 0.9);
+background: radial-gradient(circle, rgba(255, 215, 0, 0.4) 0%, transparent 70%);
+border-radius: 50%;
+width: 20px;
+height: 20px;
+pointer-events: none; /* Penting agar tidak menutupi klik tombol */
+z-index: 9999;
+box-sizing: border-box;
+will-change: transform, opacity;
+transform: translate3d(-50%, -50%, 0) scale(0);
+animation: rippleEffect 0.4s cubic-bezier(0.0, 0.7, 0.1, 1) forwards;
+}
+
+@keyframes rippleEffect {
+to {
+transform: translate3d(-50%, -50%, 0) scale(12);
+opacity: 0;
+}
+}
+
+/* CARD CONTAINER */
+.card{
+width:100%;
+max-width:450px;
+padding:35px 25px;
+border-radius:30px;
+background:rgba(10, 10, 10, 0.75);
+backdrop-filter:blur(25px);
+-webkit-backdrop-filter:blur(25px);
+border: 1px solid rgba(255,215,0,.25);
+box-shadow:0 0 60px rgba(255,215,0,.15), inset 0 0 20px rgba(255,215,0,0.05);
+text-align:center;
+position: relative;
+animation: fadeIn 1.2s ease;
+}
+
+@keyframes fadeIn {
+from { opacity: 0; transform: translateY(30px); }
+to { opacity: 1; transform: translateY(0); }
+}
+
+.profile-container {
+position: relative;
+width: 145px;
+height: 145px;
+margin: 0 auto;
+}
+
+.profile{
+width:100%;
+height:100%;
+border-radius:50%;
+border:4px solid #FFD700;
+box-shadow:0 0 30px rgba(255, 215, 0, 0.5);
+object-fit: cover;
+transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.card:hover .profile {
+transform: rotate(10deg) scale(1.08);
+box-shadow:0 0 45px rgba(255, 215, 0, 0.8);
+}
+
+/* LIVE BADGE */
+.live-badge {
+position: absolute;
+bottom: 5px;
+right: 5px;
+background: #ff2a2a;
+color: white;
+font-size: 10px;
+font-weight: 700;
+padding: 3px 12px;
+border-radius: 20px;
+box-shadow: 0 0 15px #ff2a2a;
+animation: pulseDestroy 1.5s infinite;
+text-transform: uppercase;
+letter-spacing: 1px;
+}
+
+@keyframes pulseDestroy {
+0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 42, 42, 0.8); }
+70% { transform: scale(1.05); box-shadow: 0 0 0 12px rgba(255, 42, 42, 0); }
+100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 42, 42, 0); }
+}
+
+.name{
+font-family: 'Orbitron', sans-serif;
+font-size:32px;
+font-weight:900;
+color:#FFD700;
+margin-top:18px;
+letter-spacing: 1.5px;
+text-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+animation: textGlow 2s infinite alternate;
+}
+
+@keyframes textGlow {
+0% { text-shadow: 0 0 10px rgba(255,215,0,0.4); }
+100% { text-shadow: 0 0 25px rgba(255,215,0,0.8), 0 0 5px #fff; }
+}
+
+.bio{
+color:#ccc;
+margin-top:6px;
+font-size: 14px;
+font-weight: 400;
+}
+
+#clock{
+margin-top:15px;
+color:#FFD700;
+font-weight:700;
+background: rgba(255, 215, 0, 0.08);
+display: inline-block;
+padding: 5px 18px;
+border-radius: 20px;
+border: 1px solid rgba(255, 215, 0, 0.3);
+font-size: 15px;
+letter-spacing: 1px;
+box-shadow: 0 0 10px rgba(255,215,0,0.1);
+}
+
+/* BANNER */
+.banner{
+margin:25px 0 15px 0;
+padding:20px;
+border-radius:20px;
+background: linear-gradient(135deg, rgba(255,215,0,.15), rgba(255,215,0,.03));
+border:1px solid rgba(255,215,0,.35);
+box-shadow: inset 0 0 15px rgba(255,215,0,.1);
+}
+
+.banner h2{
+color:#FFD700;
+font-size:21px;
+font-weight: 700;
+text-shadow: 0 0 10px rgba(255,215,0,0.3);
+}
+
+.banner p{
+color:#bbb;
+font-size:13px;
+margin-top:5px;
+}
+
+/* STATS */
+.stats{
+display:flex;
+gap:10px;
+margin:15px 0;
+}
+
+.stat{
+flex:1;
+padding:14px 10px;
+border-radius:15px;
+background:rgba(255,215,0,.08);
+border: 1px solid rgba(255, 215, 0, 0.15);
+transition: 0.2s;
+cursor: pointer;
+}
+
+.stat:hover {
+background:rgba(255,215,0,.18);
+transform: translateY(-3px);
+border-color: rgba(255, 215, 0, 0.5);
+box-shadow: 0 5px 15px rgba(255,215,0,0.1);
+}
+
+.stat h3{
+color:#FFD700;
+font-size: 18px;
+font-weight: 700;
+}
+
+.stat span{
+color:#aaa;
+font-size:12px;
+}
+
+/* INFO */
+.info-card{
+margin:15px 0;
+padding:15px;
+border-radius:15px;
+background:rgba(255,255,255,.04);
+border: 1px solid rgba(255,255,255,.08);
+color:#ccc;
+text-align: left;
+font-size: 13px;
+}
+
+.info-item {
+display: flex;
+justify-content: space-between;
+margin-bottom: 8px;
+}
+.info-item:last-child { margin-bottom: 0; }
+
+.info-value {
+color: #FFF;
+font-weight: 500;
+}
+
+/* QUOTE */
+.quote{
+margin:15px 0;
+padding:15px;
+border-left:4px solid #FFD700;
+background:linear-gradient(90deg, rgba(255,215,0,.08), transparent);
+color:#FFD700;
+font-style:italic;
+border-radius: 0 15px 15px 0;
+font-size: 14px;
+}
+
+/* LINKS */
+.link{
+display:block;
+padding:16px;
+margin-top:14px;
+border-radius:16px;
+background:rgba(255,215,0,.08);
+border:1px solid rgba(255,215,0,.2);
+color:white;
+text-decoration:none;
+font-weight:600;
+font-size: 15px;
+transition: all .25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+position: relative;
+overflow: hidden;
+box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+}
+
+.link:hover{
+transform:translateY(-4px) scale(1.03);
+background:rgba(255,215,0,.2);
+border-color:#FFD700;
+box-shadow:0 10px 25px rgba(255,215,0,0.25);
+text-shadow: 0 0 8px rgba(255,255,255,0.6);
+}
+
+.link:active {
+transform: translateY(-1px) scale(0.99);
+}
+
+/* MUSIC BOX & CONTROLLER */
+.music-box{
+margin-top:20px;
+padding:15px;
+border-radius:15px;
+background:rgba(255,215,0,.12);
+border: 1px solid rgba(255, 215, 0, 0.3);
+color:#FFD700;
+display: flex;
+align-items: center;
+justify-content: space-between;
+font-size: 13px;
+font-weight: 500;
+box-shadow: 0 0 15px rgba(255,215,0,0.05);
+}
+
+.music-animation {
+display: flex;
+gap: 3px;
+align-items: flex-end;
+height: 15px;
+}
+
+.music-bar {
+width: 3px;
+height: 100%;
+background-color: #FFD700;
+animation: bounceBars 0.8s ease infinite alternate;
+border-radius: 2px;
+box-shadow: 0 0 5px #FFD700;
+}
+.music-bar:nth-child(2) { animation-delay: 0.2s; height: 70%; }
+.music-bar:nth-child(3) { animation-delay: 0.4s; height: 40%; }
+.music-bar:nth-child(4) { animation-delay: 0.1s; height: 85%; }
+
+@keyframes bounceBars {
+0% { height: 20%; }
+100% { height: 100%; }
+}
+
+.music-btn {
+background: #FFD700;
+color: #050505;
+border: none;
+padding: 5px 12px;
+border-radius: 10px;
+font-weight: 700;
+font-size: 11px;
+cursor: pointer;
+box-shadow: 0 0 10px rgba(255,215,0,0.5);
+transition: 0.2s;
+}
+.music-btn:hover { transform: scale(1.08); box-shadow: 0 0 15px rgba(255,215,0,0.8); }
+
+.footer{
+margin-top:25px;
+font-size:12px;
+color:#777;
+letter-spacing: 0.5px;
+}
+</style>
+</head>
+<body>
+
+<div id="loader">
+<div class="loader-content">
+<img class="loader-logo" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
+<div class="loader-title">MARGA AEVRIX</div>
+<div class="loader-progress">
+<div class="loader-progress-fill"></div>
+</div>
+<div class="loader-status" id="loadingStatus">Initializing System...</div>
+</div>
+</div>
+
+<div class="bg"></div>
+<canvas id="particleCanvas"></canvas>
+
+<div class="card">
+<div class="profile-container">
+<img class="profile" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
+<div class="live-badge">Live</div>
+</div>
+
+<div class="name">MARGA AEVRIX</div>
+<div class="bio">Premium Community • Minecraft Creator</div>
+<div id="clock">00:00:00</div>
+
+<div class="banner">
+<h2>✨ Welcome To Marga Aevrix</h2>
+<p>Creator • Minecraft • Community</p>
+</div>
+
+<div class="stats">
+<div class="stat">
+<h3>1K+</h3>
+<span>Member</span>
+</div>
+<div class="stat">
+<h3>24/7</h3>
+<span>Active</span>
+</div>
+<div class="stat">
+<h3>2026</h3>
+<span>Community</span>
+</div>
+</div>
+
+<div class="info-card">
+<div class="info-item"><span>👥 Member:</span><span class="info-value">1000+ Players</span></div>
+<div class="info-item"><span>🎮 Server Status:</span><span class="info-value" style="color: #00ff66; text-shadow: 0 0 5px #00ff66;">● Active Online</span></div>
+<div class="info-item"><span>⚡ Network Ping:</span><span class="info-value" id="pingValue">24ms</span></div>
+</div>
+
+<div class="quote">"Build, Create, Inspire."</div>
+
+<a class="link" href="https://chat.whatsapp.com/E2psS9BgbAZAf8RFr3YKv3" target="_blank">💬 Join Grup WhatsApp</a>
+<a class="link" href="https://whatsapp.com/channel/0029Vb8nGqI4IBhLlEhJIa1N" target="_blank">📢 WhatsApp Channel</a>
+<a class="link" href="https://tiktok.com/@marga_aevrix02" target="_blank">🎵 TikTok Channel</a>
+
+<div class="music-box">
+<div style="display: flex; align-items: center; gap: 10px;">
+<div class="music-animation" id="musicAnim">
+<div class="music-bar"></div>
+<div class="music-bar"></div>
+<div class="music-bar"></div>
+<div class="music-bar"></div>
+</div>
+<span id="musicTrackName">🎵 Playing: Sad Piano Theme</span>
+</div>
+<button class="music-btn" id="muteBtn">MUTE</button>
+</div>
+
+<div class="footer">© 2026 Marga Aevrix • All Rights Reserved</div>
+</div>
+
+<audio id="bgMusic" loop>
+<source src="https://cdn.pixabay.com/download/audio/2023/03/16/audio_6b8d6f77fb.mp3?filename=sad-piano-141482.mp3" type="audio/mp3">
+</audio>
+
+<audio id="clickSound" preload="auto">
+<source src="https://assets.mixkit.co/active_storage/sfx/2568/2568-84.wav" type="audio/wav">
+</audio>
+
+<script>
+//--- HANDLING AUDIO MUSIC & CLICK SFX ---
+const bgMusic = document.getElementById("bgMusic");
+const clickSound = document.getElementById("clickSound");
+const muteBtn = document.getElementById("muteBtn");
+const musicAnim = document.getElementById("musicAnim");
+
+bgMusic.volume = 0.4;
+clickSound.volume = 0.6;
+
+let initialInteraction = false;
+
+function startMusic() {
+bgMusic.play().then(() => {
+updateMusicUI(true);
+}).catch(() => {
+updateMusicUI(false);
+});
+}
+
+function updateMusicUI(isPlaying) {
+if(isPlaying) {
+muteBtn.innerText = "MUTE";
+musicAnim.style.opacity = "1";
+} else {
+muteBtn.innerText = "PLAY";
+musicAnim.style.opacity = "0";
+}
+}
+
+// Play SFX instan dengan mematikan suara sebelumnya (mencegah delay tumpang tindih)
+function playClickSfx() {
+if (clickSound) {
+clickSound.pause();
+clickSound.currentTime = 0; 
+clickSound.play().catch(e => console.log("Audio menunggu interaksi user pertama."));
+}
+}
+
+// Tombol kendali ON/OFF Musik (Mute/Play)
+muteBtn.addEventListener("pointerdown", (e) => {
+e.stopPropagation(); // Biar tidak memicu dobel sfx klik layar global
+playClickSfx();
+if (bgMusic.paused) {
+bgMusic.play();
+updateMusicUI(true);
+} else {
+bgMusic.pause();
+updateMusicUI(false);
+}
+});
+
+// Suara klik instan khusus tombol ketika ditekan langsung
+const clickableElements = document.querySelectorAll('.link, .stat');
+clickableElements.forEach(element => {
+element.addEventListener('pointerdown', (e) => {
+playClickSfx();
+});
+});
+
+
+//--- GLOBAL INSTANT ANIMATION & AUDIO RIPPLE (AKURAT MENGIKUTI JARI / KOORDINAT FIXED) ---
+window.addEventListener('pointerdown', (e) => {
+playClickSfx();
+
+if(!initialInteraction) {
+startMusic();
+initialInteraction = true;
+}
+
+// Pembuatan elemen ripple secepat kilat
+const ripple = document.createElement('span');
+ripple.className = 'ripple';
+document.body.appendChild(ripple);
+
+// Menggunakan pageX & pageY agar posisi lingkaran mutlak mengikuti titik sentuh kursor/jari Anda
+ripple.style.left = `${e.pageX}px`;
+ripple.style.top = `${e.pageY}px`;
+
+setTimeout(() => {
+ripple.remove();
+}, 400);
+});
+
+
+//--- CANVAS DYNAMIC PARTICLES ENGINE (Mengisi kekosongan latar belakang) ---
+const canvas = document.getElementById("particleCanvas");
+const ctx = canvas.getContext("2d");
+let particlesArray = [];
+const numberOfParticles = 60; 
+
+function resizeCanvas() {
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+class Particle {
+constructor() {
+this.x = Math.random() * canvas.width;
+this.y = Math.random() * canvas.height + canvas.height;
+this.size = Math.random() * 3 + 1;
+this.speedY = Math.random() * 1.2 + 0.4;
+this.alpha = Math.random() * 0.7 + 0.3;
+}
+update() {
+this.y -= this.speedY;
+if (this.y < -10) {
+this.y = canvas.height + 10;
+this.x = Math.random() * canvas.width;
+}
+}
+draw() {
+ctx.save();
+ctx.globalAlpha = this.alpha;
+ctx.beginPath();
+ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+ctx.fillStyle = "#FFD700";
+ctx.shadowBlur = 8;
+ctx.shadowColor = "#FFD700";
+ctx.fill();
+ctx.restore();
+}
+}
+
+function initParticles() {
+particlesArray = [];
+for (let i = 0; i < numberOfParticles; i++) {
+particlesArray.push(new Particle());
+}
+}
+
+function animateParticles() {
+ctx.clearRect(0, 0, canvas.width, canvas.height);
+for (let i = 0; i < particlesArray.length; i++) {
+particlesArray[i].update();
+particlesArray[i].draw();
+}
+requestAnimationFrame(animateParticles);
+}
+initParticles();
+animateParticles();
+
+
+//--- HANDLING PROSES LOADING SCREEN ---
+const statusText=[
+"Initializing Core Systems...",
+"Loading Graphics & Assets...",
+"Connecting Marga Aevrix Core...",
+"Compiling Database Server...",
+"Welcome to Marga Aevrix 2026!"
+];
+
+let statusIndex=0;
+const statusInterval=setInterval(()=>{
+const el=document.getElementById("loadingStatus");
+if(el && statusIndex<statusText.length){
+el.innerText=statusText[statusIndex];
+statusIndex++;
+}
+},800);
+
+window.addEventListener("load",()=>{
+setTimeout(()=>{
+const loader=document.getElementById("loader");
+if(loader) {
+loader.style.opacity="0";
+clearInterval(statusInterval);
+startMusic();
+setTimeout(()=>{
+loader.style.display="none";
+},1000);
+}
+},4000);
+});
+
+
+//--- REALTIME JAM & LIVE FAKE PING ---
+setInterval(()=>{
+const clock=document.getElementById("clock");
+if(clock){
+clock.innerHTML=new Date().toLocaleTimeString("id-ID");
+}
+},1000);
+
+setInterval(() => {
+const pingEl = document.getElementById("pingValue");
+if(pingEl) {
+const randomPing = Math.floor(Math.random() * (32 - 16 + 1)) + 16;
+pingEl.innerHTML = randomPing + "ms";
+}
+}, 2000);
+</script>
+
+</body>
+</html>
